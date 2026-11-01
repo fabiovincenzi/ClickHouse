@@ -48,7 +48,9 @@ METRIC FAMILIES INNER COLUMNS
 
 INSERT INTO ts_inner (metric_family, type, unit, help) VALUES ('cpu_usage', 'gauge', 'percent', 'CPU usage');
 
-SELECT metric_family, toTypeName(metric_family), type, unit, help FROM timeSeriesMetricFamilies(ts_inner);
+-- Parallel replicas are disabled for this query: the initiator sends the argument of `timeSeriesMetricFamilies` to the
+-- replicas unqualified, so they look the table up in the `default` database, see https://github.com/ClickHouse/ClickHouse/issues/118130.
+SELECT metric_family, toTypeName(metric_family), type, unit, help FROM timeSeriesMetricFamilies(ts_inner) SETTINGS enable_parallel_replicas = 0;
 SELECT metric_family, type, unit, help FROM ts_inner WHERE metric_family != '';
 
 DROP TABLE ts_inner;
